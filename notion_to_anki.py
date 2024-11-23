@@ -2,8 +2,8 @@ import requests
 import json
 
 # Notion の設定
-NOTION_API_TOKEN = "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"
-DATABASE_ID = "https://www.notion.so/Words-14728509e2b280a9b820c259d187e9ee?pvs=4"
+NOTION_API_TOKEN = "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"
+DATABASE_ID = "14728509e2b280a9b820c259d187e9ee?pvs=4"
 
 headers = {
     "Authorization": f"Bearer {NOTION_API_TOKEN}",
@@ -16,7 +16,16 @@ def get_notion_entries():
     url = f"https://api.notion.com/v1/databases/{DATABASE_ID}/query"
     response = requests.post(url, headers=headers)
     data = response.json()
+    print(data)  # レスポンスデータを表示
+    if response.status_code != 200:
+        print(f"Notion API からのエラー: {data.get('message')}")
+        return []
+    if "results" not in data:
+        print("レスポンスデータに 'results' キーがありません。")
+        return []
     entries = []
+    # 以下、省略
+
     for result in data["results"]:
         properties = result["properties"]
 
@@ -101,3 +110,22 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+
+# import requests
+
+# # Notion の設定
+# NOTION_API_TOKEN = (
+#     "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"  # 現在のトークンを使用
+# )
+# headers = {
+#     "Authorization": f"Bearer {NOTION_API_TOKEN}",
+#     "Notion-Version": "2022-06-28",
+# }
+
+# # ユーザー情報を取得するエンドポイント
+# url = "https://api.notion.com/v1/users"
+
+# response = requests.get(url, headers=headers)
+# print(response.status_code)
+# print(response.json())
