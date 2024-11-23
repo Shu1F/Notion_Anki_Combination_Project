@@ -2,8 +2,8 @@ import requests
 import json
 
 # Notion の設定
-NOTION_API_TOKEN = "あなたの Notion API トークン"
-DATABASE_ID = "あなたのデータベース ID"
+NOTION_API_TOKEN = "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"
+DATABASE_ID = "https://www.notion.so/Words-14728509e2b280a9b820c259d187e9ee?pvs=4"
 
 headers = {
     "Authorization": f"Bearer {NOTION_API_TOKEN}",
