@@ -2,8 +2,8 @@ import requests
 import json
 
 # Notion の設定
-NOTION_API_TOKEN = "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"
-DATABASE_ID = "14728509e2b280a9b820c259d187e9ee?pvs=4"
+NOTION_API_TOKEN = "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"
+DATABASE_ID = "14728509e2b2809c8161f7d563958d75"
 
 headers = {
     "Authorization": f"Bearer {NOTION_API_TOKEN}",
@@ -24,15 +24,14 @@ def get_notion_entries():
         print("レスポンスデータに 'results' キーがありません。")
         return []
     entries = []
-    # 以下、省略
 
     for result in data["results"]:
         properties = result["properties"]
 
         # 各フィールドからデータを取得
         spell = (
-            properties["Spell"]["title"][0]["plain_text"]
-            if properties["Spell"]["title"]
+            properties["Name"]["title"][0]["plain_text"]
+            if properties["Name"]["title"]
             else ""
         )
         pronunciation = (
@@ -65,13 +64,14 @@ def get_notion_entries():
                 "example": example,
             }
         )
+
     return entries
 
 
 def add_card_to_anki(entry):
     anki_connect_url = "http://localhost:8765"
     note = {
-        "deckName": "Default",  # 追加したいデッキ名
+        "deckName": "default",  # デッキ名を修正
         "modelName": "NotionWord",  # Anki で作成したノートタイプの名前
         "fields": {
             "Spell": entry["spell"],
@@ -79,20 +79,23 @@ def add_card_to_anki(entry):
             "Category": entry["category"],
             "In Japanese": entry["in_japanese"],
             "Example": entry["example"],
-            "Front": "",  # フィールドが空でもエラーが出ないように
-            "Back": "",
+            "Front": entry["spell"] or "No data",  # 空フィールドを防止
+            "Back": entry["in_japanese"] or "No data",
         },
         "options": {
             "allowDuplicate": False,
             "duplicateScope": "deck",
             "duplicateScopeOptions": {
-                "deckName": "Default",
+                "deckName": "default",
                 "checkChildren": False,
                 "checkAllModels": False,
             },
         },
         "tags": ["Notion"],
     }
+    # デバッグ用: 送信データを表示
+    print("送信データ:", json.dumps(note, indent=4, ensure_ascii=False))
+
     payload = {"action": "addNote", "version": 6, "params": {"note": note}}
     response = requests.post(anki_connect_url, data=json.dumps(payload))
     return response.json()
@@ -110,22 +113,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-
-# import requests
-
-# # Notion の設定
-# NOTION_API_TOKEN = (
-#     "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"  # 現在のトークンを使用
-# )
-# headers = {
-#     "Authorization": f"Bearer {NOTION_API_TOKEN}",
-#     "Notion-Version": "2022-06-28",
-# }
-
-# # ユーザー情報を取得するエンドポイント
-# url = "https://api.notion.com/v1/users"
-
-# response = requests.get(url, headers=headers)
-# print(response.status_code)
-# print(response.json())
